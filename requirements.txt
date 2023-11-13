@@ -1,0 +1,4 @@
+tensorflow
+pickle
+flask
+os
