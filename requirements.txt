@@ -1,4 +1,10 @@
+Flask
+flask-cors
+pandas
+flask_restful
+peewee
+category_encoders
+flask-jwt-extended
+gevent
 tensorflow
-pickle
-flask
 regex
