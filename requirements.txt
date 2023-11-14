@@ -1,4 +1,4 @@
 tensorflow
 pickle
 flask
-os
+regex

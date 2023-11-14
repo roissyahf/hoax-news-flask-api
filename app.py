@@ -1,13 +1,10 @@
 import tensorflow as tf
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 import pickle
-from flask import Flask
-import os
+from flask import Flask, jsonify
+import re
 
 app = Flask(__name__)
-
-# load the model and tokenizer
-model = tf.keras.models.load_model('model.h5')
-tokenizer = pickle.load(open('tokenizer.pickle', 'rb'))
 
 # process input news
 def clean_input(text):
@@ -50,16 +47,26 @@ def predict(input_news):
     # prediction
     tresh = 0.55
     proba = model.predict(text_padded)
-    class_id = (proba > tresh).astype(int)
+    class_id = int((proba > tresh).astype(int)[0][0])
+    prob_hoax = float(proba[0][0])
+    prob_valid = 1 - prob_hoax
 
-    if class_id == 0:
-        result_string = f'HOAX dengan tingkat kepercayaan {proba}'
-    else:
-        result_string = f'VALID dengan tingkat kepercayaan {proba}'
-    
-    return result_string
+    return jsonify({'teks berita': text,
+                    'prediksi kelas': class_id,
+                    'probabilitas hoax': prob_hoax,
+                    'probabilitas valid': prob_valid})
+
 
 if __name__ == '__main__':
-    # use port default 8080
-    port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port)
+    try:
+        port = int(sys.argv[1]) # This is for a command-line input
+    except:
+        port = 12345 # If you don't provide any port the port will be set to 12345
+    
+    # load the model and tokenizer
+    model = tf.keras.models.load_model('model.h5')
+    print('Model loaded')
+    tokenizer = pickle.load(open('tokenizer.pickle', 'rb'))
+    print('Tokenizer loaded')
+
+    app.run(debug=True, port=port)
