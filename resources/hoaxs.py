@@ -87,8 +87,8 @@ class Hoax(UserBase):
         tresh = 0.55
         proba = model.predict(text_padded)
         class_id = int((proba > tresh).astype(int)[0][0])
-        prob_hoax = float(proba[0][0])
-        prob_valid = 1 - prob_hoax
+        prob_hoax = round(float(proba[0][0])*100,2)
+        prob_valid = round((100 - prob_hoax),2)
         # models.MentalHelps.create(
         #     Age=Age,
         #     health_problems=hasil,
@@ -97,8 +97,8 @@ class Hoax(UserBase):
             jsonify(
                 {'teks berita': text,
                     'prediksi kelas': class_id,
-                    'probabilitas hoax': prob_hoax,
-                    'probabilitas valid': prob_valid}
+                    'probabilitas hoax': f'{prob_hoax}%',
+                    'probabilitas valid': f'{prob_valid}%'}
             ),
             200,
         )
